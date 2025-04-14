@@ -1,4 +1,3 @@
-
 import L from "leaflet";
 import { Location } from "./algorithms";
 
@@ -8,7 +7,7 @@ export function generateUniqueId(): string {
 }
 
 // Create a custom icon for markers
-export function createMarkerIcon(color: string = "blue"): L.Icon {
+export function createMarkerIcon(color: string = "blue"): L.DivIcon {
   const colors: Record<string, string> = {
     blue: "#3b82f6",
     green: "#22c55e", 
