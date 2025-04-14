@@ -22,34 +22,39 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-md">Performance Metrics</CardTitle>
+    <Card className="overflow-hidden border-border/40 shadow-lg animate-fade-in">
+      <CardHeader className="pb-2 bg-secondary/40">
+        <CardTitle className="text-md flex items-center gap-2">
+          <span className="inline-block p-1.5 rounded-full bg-primary/20">
+            <Timer className="h-4 w-4 text-primary" />
+          </span>
+          Performance Metrics
+        </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-4">
         <div className="grid grid-cols-3 gap-4">
-          <div className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-center rounded-full bg-blue-100 p-2 mb-2">
-              <Ruler className="h-4 w-4 text-blue-600" />
+          <div className="flex flex-col items-center p-3 bg-accent/30 rounded-lg transition-all hover:bg-accent/50 duration-300">
+            <div className="flex items-center justify-center rounded-full bg-blue-900/40 p-2 mb-2">
+              <Ruler className="h-4 w-4 text-blue-400" />
             </div>
-            <span className="text-xs text-gray-500">Total Distance</span>
-            <span className="text-lg font-bold">{formatDistance(distance)}</span>
+            <span className="text-xs text-muted-foreground">Total Distance</span>
+            <span className="text-lg font-bold text-foreground">{formatDistance(distance)}</span>
           </div>
 
-          <div className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-center rounded-full bg-green-100 p-2 mb-2">
-              <Timer className="h-4 w-4 text-green-600" />
+          <div className="flex flex-col items-center p-3 bg-accent/30 rounded-lg transition-all hover:bg-accent/50 duration-300">
+            <div className="flex items-center justify-center rounded-full bg-green-900/40 p-2 mb-2">
+              <Timer className="h-4 w-4 text-green-400" />
             </div>
-            <span className="text-xs text-gray-500">Execution Time</span>
-            <span className="text-lg font-bold">{formatExecutionTime(executionTime)}</span>
+            <span className="text-xs text-muted-foreground">Execution Time</span>
+            <span className="text-lg font-bold text-foreground">{formatExecutionTime(executionTime)}</span>
           </div>
 
-          <div className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-center rounded-full bg-purple-100 p-2 mb-2">
-              <RotateCw className="h-4 w-4 text-purple-600" />
+          <div className="flex flex-col items-center p-3 bg-accent/30 rounded-lg transition-all hover:bg-accent/50 duration-300">
+            <div className="flex items-center justify-center rounded-full bg-purple-900/40 p-2 mb-2">
+              <RotateCw className="h-4 w-4 text-purple-400" />
             </div>
-            <span className="text-xs text-gray-500">Iterations</span>
-            <span className="text-lg font-bold">{iterations.toLocaleString()}</span>
+            <span className="text-xs text-muted-foreground">Iterations</span>
+            <span className="text-lg font-bold text-foreground">{iterations.toLocaleString()}</span>
           </div>
         </div>
       </CardContent>

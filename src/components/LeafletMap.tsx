@@ -6,8 +6,6 @@ import { Location } from '../utils/algorithms';
 import { createMarkerIcon, getBoundsForLocations, getMarkerColor, routeToPolyline, createRouteStyle } from '../utils/mapUtils';
 
 // Fix Leaflet icon paths
-// This is required because Leaflet's default marker icons use absolute URLs which don't work properly
-// when compiled in some environments
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -37,13 +35,14 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
   const evaluatingEdgeLayerRef = useRef<L.Polyline | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
-  // Initialize map on component mount
+  // Initialize map on component mount with dark mode
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
+      // Use a dark-themed map style
       const map = L.map(mapContainerRef.current).setView([40, -95], 4);
       
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19,
       }).addTo(map);
       
@@ -51,8 +50,56 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       
       // Add map click handler
       map.on('click', (e: L.LeafletMouseEvent) => {
+        // Create a ripple effect on click
+        const ripple = L.divIcon({
+          html: `<div class="ripple"></div>`,
+          className: 'ripple-container',
+          iconSize: [20, 20]
+        });
+        
+        const rippleMark = L.marker(e.latlng, { icon: ripple })
+          .addTo(map)
+          .on('add', () => {
+            setTimeout(() => {
+              map.removeLayer(rippleMark);
+            }, 1000);
+          });
+        
         onMapClick([e.latlng.lat, e.latlng.lng]);
       });
+
+      // Add custom CSS for the ripple effect
+      if (!document.getElementById('leaflet-ripple-style')) {
+        const style = document.createElement('style');
+        style.id = 'leaflet-ripple-style';
+        style.innerHTML = `
+          .ripple-container {
+            background: transparent;
+          }
+          .ripple {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(66, 153, 225, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ripple-animation 1s ease-out;
+          }
+          @keyframes ripple-animation {
+            0% {
+              width: 0;
+              height: 0;
+              opacity: 1;
+            }
+            100% {
+              width: 100px;
+              height: 100px;
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
     }
     
     return () => {
@@ -77,7 +124,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       }
     });
     
-    // Add new markers and update existing ones
+    // Add new markers and update existing ones with animation
     locations.forEach((location, index) => {
       const marker = markersRef.current[location.id];
       const color = getMarkerColor(index, locations.length);
@@ -85,22 +132,88 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       if (marker) {
         // Update existing marker position and popup
         marker.setLatLng(location.position);
-        marker.bindPopup(`<b>${location.name}</b><br>Stop #${index + 1}`);
+        marker.bindPopup(`
+          <div class="text-white">
+            <b>${location.name}</b><br>Stop #${index + 1}
+          </div>
+        `);
       } else {
-        // Create new marker
+        // Create new marker with animation
         const icon = createMarkerIcon(color);
-        const newMarker = L.marker(location.position, { icon })
-          .bindPopup(`<b>${location.name}</b><br>Stop #${index + 1}`)
-          .addTo(mapRef.current!);
+        const newMarker = L.marker(location.position, { 
+          icon,
+          opacity: 0 // Start invisible for animation
+        })
+        .bindPopup(`
+          <div class="text-white">
+            <b>${location.name}</b><br>Stop #${index + 1}
+          </div>
+        `)
+        .addTo(mapRef.current!);
+        
+        // Animate marker appearance
+        setTimeout(() => {
+          newMarker.setOpacity(1);
+        }, index * 100);
         
         markersRef.current[location.id] = newMarker;
+        
+        // Add a pulsing effect to the first marker (depot)
+        if (index === 0) {
+          const pulsingIcon = L.divIcon({
+            html: `<div class="pulse-ring"></div>`,
+            className: 'pulse-icon',
+            iconSize: [30, 30]
+          });
+          
+          const pulsingMarker = L.marker(location.position, { 
+            icon: pulsingIcon,
+            zIndexOffset: -1
+          }).addTo(mapRef.current!);
+          
+          // Add custom CSS for the pulse effect
+          if (!document.getElementById('pulse-marker-style')) {
+            const style = document.createElement('style');
+            style.id = 'pulse-marker-style';
+            style.innerHTML = `
+              .pulse-icon {
+                background: transparent;
+              }
+              .pulse-ring {
+                position: absolute;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: rgba(38, 194, 129, 0.2);
+                border: 2px solid rgba(38, 194, 129, 0.5);
+                transform: translate(-50%, -50%);
+                animation: pulse-animation 2s infinite;
+              }
+              @keyframes pulse-animation {
+                0% {
+                  transform: translate(-50%, -50%) scale(0.5);
+                  opacity: 1;
+                }
+                100% {
+                  transform: translate(-50%, -50%) scale(1.5);
+                  opacity: 0;
+                }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+        }
       }
     });
     
     // Fit bounds if we have locations
     const bounds = getBoundsForLocations(locations);
     if (bounds && mapRef.current) {
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      mapRef.current.fitBounds(bounds, { 
+        padding: [50, 50],
+        animate: true,
+        duration: 0.5
+      });
     }
   }, [locations]);
   
@@ -112,12 +225,51 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       routeLayerRef.current = null;
     }
     
-    // Add new route if available
+    // Add new route if available with animation
     if (route && route.length > 1 && mapRef.current) {
-      const polyline = L.polyline(routeToPolyline(route), createRouteStyle('#3388ff', 4))
+      const routePoints = routeToPolyline(route);
+      
+      // Create animated polyline
+      const polyline = L.polyline([], createRouteStyle('#4da6ff', 4))
         .addTo(mapRef.current);
       
       routeLayerRef.current = polyline;
+      
+      // Animate the route drawing
+      let i = 0;
+      const drawRoute = () => {
+        if (i < routePoints.length) {
+          const currentPath = routePoints.slice(0, i + 1);
+          polyline.setLatLngs(currentPath);
+          i++;
+          setTimeout(drawRoute, 50);
+        }
+      };
+      
+      drawRoute();
+      
+      // Add direction arrows
+      setTimeout(() => {
+        if (mapRef.current && routeLayerRef.current) {
+          const arrowDecorator = L.polylineDecorator(polyline, {
+            patterns: [
+              {
+                offset: 25,
+                repeat: 100,
+                symbol: L.Symbol.arrowHead({
+                  pixelSize: 12,
+                  polygon: false,
+                  pathOptions: {
+                    color: '#4da6ff',
+                    weight: 3,
+                    opacity: 0.8
+                  }
+                })
+              }
+            ]
+          }).addTo(mapRef.current);
+        }
+      }, routePoints.length * 50 + 100);
     }
   }, [route]);
   
@@ -131,7 +283,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
     
     // Add new step path if available
     if (currentStepPath && currentStepPath.length > 1 && mapRef.current && !route) {
-      const polyline = L.polyline(routeToPolyline(currentStepPath), createRouteStyle('#ff7800', 3))
+      const polyline = L.polyline(routeToPolyline(currentStepPath), createRouteStyle('#ff7800', 3, 0.7, [5, 10]))
         .addTo(mapRef.current);
       
       currentStepLayerRef.current = polyline;
@@ -146,21 +298,63 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       evaluatingEdgeLayerRef.current = null;
     }
     
-    // Add new edge if available
+    // Add new edge if available with animation
     if (evaluatingEdge && mapRef.current) {
       const [from, to] = evaluatingEdge;
+      
+      // Create a dashed line with animation
       const polyline = L.polyline(
         [[from.position[0], from.position[1]], [to.position[0], to.position[1]]],
-        { color: '#ff3300', weight: 2, dashArray: '5, 10', opacity: 0.6 }
+        { 
+          color: '#ff3300', 
+          weight: 2, 
+          dashArray: '5, 10', 
+          opacity: 0,
+          className: 'evaluating-edge'
+        }
       ).addTo(mapRef.current);
+      
+      // Add CSS animation for the dashed line
+      if (!document.getElementById('evaluating-edge-style')) {
+        const style = document.createElement('style');
+        style.id = 'evaluating-edge-style';
+        style.innerHTML = `
+          .evaluating-edge {
+            stroke-dashoffset: 0;
+            animation: dash 1s linear, fade-in 0.3s forwards;
+          }
+          @keyframes dash {
+            to {
+              stroke-dashoffset: -30;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      // Fade in the line
+      setTimeout(() => {
+        if (polyline) {
+          polyline.setStyle({ opacity: 0.6 });
+        }
+      }, 10);
       
       evaluatingEdgeLayerRef.current = polyline;
     }
   }, [evaluatingEdge]);
 
   return (
-    <div ref={mapContainerRef} className="h-full w-full rounded-lg shadow-lg" />
+    <div ref={mapContainerRef} className="h-full w-full rounded-lg shadow-lg transition-all duration-300" />
   );
 };
+
+// Add the polyline decorator dependency
+declare module "leaflet" {
+  namespace Symbol {
+    function arrowHead(options: any): any;
+  }
+  
+  function polylineDecorator(polyline: L.Polyline, options: any): any;
+}
 
 export default LeafletMap;
