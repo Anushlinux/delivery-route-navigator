@@ -22,6 +22,11 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { MainLayout } from "@/components/layout/main-layout";
+import { Header } from "@/components/layout/header";
+import { MapSection } from "@/components/sections/map-section";
+import { ControlPanel } from "@/components/sections/control-panel";
+import { InfoDialog } from "@/components/dialogs/info-dialog";
 
 const Index = () => {
   // State for locations, routes, and algorithm
@@ -248,149 +253,52 @@ const Index = () => {
       : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fffbe9] via-[#fef7fa] to-[#dbfbff] section-padding transition-colors duration-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 animate-fade-in">
-        <header className="mb-7 animate-slide-in">
-          <div className="flex items-center justify-between gap-x-3">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-foreground flex items-center drop-shadow-lg">
-              <PackageOpen className="mr-2 h-10 w-10 text-primary drop-shadow-xl" />
-              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-[#70e1bf] bg-clip-text text-transparent select-none font-playfair tracking-tight">DeliveryRoute Navigator</span>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="ml-2"
-                onClick={() => setShowInfoDialog(true)}
-              >
-                <Info className="h-6 w-6 text-amber-400 hover:text-primary transition-colors" />
-              </Button>
-            </h1>
-            <div className="flex items-center">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center rounded-full bg-amber-100/65 px-3 py-1 text-base text-foreground drop-shadow animate-scale-in">
-                      <RouteIcon className="mr-1 h-5 w-5 text-primary" />
-                      <span>Traveling Salesperson Problem Simulator</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-accent text-foreground border-border shadow-lg">
-                    <p className="w-80 text-sm">
-                      Optimizing routes with minimal distance &amp; maximum style!
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-          <p className="text-muted-foreground mt-3 text-xl font-medium max-w-2xl leading-relaxed animate-fade-in">
-            Plan beautiful multi-stop delivery routes around the world.<br className="hidden md:inline" />
-            <span className="text-primary font-bold">Fast, interactive, and fun to watch.</span>
-          </p>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Left Map */}
-          <div className="lg:col-span-2">
-            <Card className="h-[600px] overflow-hidden glass-card shadow-2xl border-0">
-              <LeafletMap
-                locations={locations}
-                route={routeToDisplay}
-                onMapClick={handleMapClick}
-                currentStepPath={currentStepPath}
-                evaluatingEdge={evaluatingEdge}
-              />
-            </Card>
-          </div>
-          {/* Controls */}
-          <div className="space-y-8">
-            <Tabs defaultValue="locations" className="animate-fade-in">
-              <TabsList className="grid w-full grid-cols-2 shadow card-gradient rounded-xl text-foreground/90 font-semibold border border-accent">
-                <TabsTrigger value="locations" className="data-[state=active]:bg-primary data-[state=active]:text-white transition-colors">Locations</TabsTrigger>
-                <TabsTrigger value="algorithm" className="data-[state=active]:bg-primary data-[state=active]:text-white transition-colors">Algorithm</TabsTrigger>
-              </TabsList>
-              <TabsContent value="locations" className="mt-3">
-                <LocationInput
-                  locations={locations}
-                  onAddLocation={handleAddLocation}
-                  onRemoveLocation={handleRemoveLocation}
-                  onClearLocations={handleClearLocations}
-                />
-              </TabsContent>
-              <TabsContent value="algorithm" className="mt-3">
-                <AlgorithmSelector
-                  selectedAlgorithm={selectedAlgorithm}
-                  onSelectAlgorithm={setSelectedAlgorithm}
-                  onCalculateRoute={handleCalculateRoute}
-                  isCalculating={isCalculating}
-                  locationsCount={locations.length}
-                />
-              </TabsContent>
-            </Tabs>
-            {routeResult && (
-              <>
-                <PerformanceMetrics
-                  distance={routeResult.distance}
-                  executionTime={routeResult.executionTime}
-                  iterations={routeResult.iterations}
-                />
-                {algorithmSteps.length > 0 && (
-                  <StepControl
-                    currentStep={currentStepIndex}
-                    totalSteps={algorithmSteps.length}
-                    isAutoPlaying={isAutoPlaying}
-                    onStepChange={setCurrentStepIndex}
-                    onToggleAutoPlay={() => setIsAutoPlaying(!isAutoPlaying)}
-                    stepDescription={currentStep?.description || ""}
-                  />
-                )}
-              </>
-            )}
-          </div>
-        </div>
-        {/* Results */}
-        {routeResult && (
-          <div className="mt-10 animate-scale-in">
-            <h2 className="text-2xl font-semibold mb-4 flex items-center text-foreground/90">
-              <RouteIcon className="mr-2 h-6 w-6 text-primary" />
-              <span>Optimal Delivery Route</span>
-            </h2>
-            <RouteDetails route={routeResult.path} distance={routeResult.distance} />
-          </div>
-        )}
-      </div>
+    <MainLayout>
+      <Header onInfoClick={() => setShowInfoDialog(true)} />
       
-      {/* Info Dialog */}
-      <Dialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
-        <DialogContent className="max-w-3xl bg-background border-border card-gradient rounded-2xl shadow-2xl animate-fade-in">
-          <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center text-foreground gap-2">
-              <Info className="h-6 w-6 text-primary" />
-              About This App
-            </DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="space-y-5 text-muted-foreground max-w-2xl">
-            <p>
-              <strong className="text-primary">Traveling Salesperson Problem (TSP)</strong> visualizer—find the shortest route to visit all your locations and see the solution in action!
-            </p>
-            <h3 className="font-semibold text-accent-foreground">Tips:</h3>
-            <ol className="list-decimal pl-6 space-y-1">
-              <li>Click the map or search an address to add stops.</li>
-              <li>Pick an algorithm, watch the animation.</li>
-              <li>See route details and metrics live!</li>
-            </ol>
-            <h3 className="font-semibold text-primary mt-4">How do the algorithms work?</h3>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><span className="font-bold text-accent-foreground">Brute Force:</span> Checks every possible order (slow for lots of stops—fun for geeks!)</li>
-              <li><span className="font-bold text-accent-foreground">Nearest Neighbor:</span> Quick and sometimes greedy—fast but not perfect.</li>
-              <li><span className="font-bold text-accent-foreground">2-Opt:</span> Keeps swapping to get shorter—a great middle ground.</li>
-            </ul>
-          </DialogDescription>
-          <DialogFooter>
-            <Button onClick={() => setShowInfoDialog(false)} className="bg-primary text-white font-bold rounded-xl py-2 px-7 shadow-xl hover:bg-amber-500/90 transition-all duration-200">Got it!</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2">
+          <MapSection
+            locations={locations}
+            routeToDisplay={routeToDisplay}
+            currentStepPath={currentStepPath}
+            evaluatingEdge={evaluatingEdge}
+            onMapClick={handleMapClick}
+          />
+        </div>
+        
+        <ControlPanel
+          locations={locations}
+          selectedAlgorithm={selectedAlgorithm}
+          isCalculating={isCalculating}
+          routeResult={routeResult}
+          currentStep={currentStepIndex}
+          algorithmSteps={algorithmSteps}
+          isAutoPlaying={isAutoPlaying}
+          onAddLocation={handleAddLocation}
+          onRemoveLocation={handleRemoveLocation}
+          onClearLocations={handleClearLocations}
+          onSelectAlgorithm={setSelectedAlgorithm}
+          onCalculateRoute={handleCalculateRoute}
+          onStepChange={setCurrentStepIndex}
+          onToggleAutoPlay={() => setIsAutoPlaying(!isAutoPlaying)}
+        />
+      </div>
+
+      {routeResult && (
+        <div className="mt-10 animate-scale-in">
+          <RouteDetails 
+            route={routeResult.path} 
+            distance={routeResult.distance} 
+          />
+        </div>
+      )}
+
+      <InfoDialog 
+        open={showInfoDialog} 
+        onOpenChange={setShowInfoDialog} 
+      />
+    </MainLayout>
   );
 };
 
