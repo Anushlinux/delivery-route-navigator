@@ -5,116 +5,118 @@
 
 @import 'leaflet/dist/leaflet.css';
 
-/* --- Revamped light mode color palette & creative glass effects --- */
+/* === Light & Modern Palette with Subtle Gradients === */
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 230 15% 14%;
-    --primary: 222.2 91.2% 59.8%;
+    --background: 43 74% 98%;
+    --foreground: 232 18% 20%;
+    --primary: 22 100% 66%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 90%;
-    --secondary-foreground: 230 15% 20%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 219 14% 41%;
-    --accent: 203 90% 95%;
-    --accent-foreground: 207 75% 40%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --secondary: 157 58% 89%;
+    --secondary-foreground: 232 18% 20%;
+    --muted: 223 39% 95%;
+    --muted-foreground: 221 15% 53%;
+    --accent: 17 91% 90%;
+    --accent-foreground: 18 80% 45%;
+    --border: 218 27% 89%;
+    --input: 218 27% 89%;
+    --ring: 22 100% 66%;
     --radius: 1.1rem;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 232 18% 20%;
 
-    --gradient-top: linear-gradient(111.4deg, #f7fcfe 0%, #e7eaf9 80%);
-    --gradient-section: linear-gradient(90deg, hsla(46, 73%, 75%, 1) 0%, hsla(176, 73%, 88%, 1) 100%);
+    --gradient-top: linear-gradient(111deg, #fffbe9 0%, #fef7fa 80%);
+    --gradient-section: linear-gradient(90deg, #ffe1b3 0%, #c3f3dd 100%);
+    --card-gradient: linear-gradient(111deg, #ffe3c3 0%, #c6f1ee 90%);
+    --strong-accent: #ffb35c;
   }
 }
 
 @layer base {
   html {
     @apply min-h-full;
-    /* Smooth background gradient */
-    background: linear-gradient(109.6deg, #DFEAF7 11.2%, #EFF8FC 91.1%);
+    background: var(--gradient-top);
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, sans-serif;
     background: var(--gradient-top);
     min-height: 100vh;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.012em;
     transition: background 0.7s;
   }
 }
 
-/* --- Card & glassy effect style --- */
+/* ==== Creative Glass and Card Effects ==== */
 .glass-card {
-  @apply bg-white/70 backdrop-blur-2xl rounded-2xl border border-blue-100 shadow-2xl;
-  border-radius: 1.2rem;
+  @apply bg-white/80 backdrop-blur-xl rounded-3xl border border-yellow-100 shadow-xl;
+  box-shadow: 0 8px 32px 0 rgba(255,200,120,0.11), 0 1.5px 8px 0 #ffdba6a2;
 }
 
 .glassy-map {
-  @apply bg-blue-50/40 backdrop-blur-xl border border-blue-100 shadow-lg;
+  @apply bg-amber-50/60 backdrop-blur-3xl border border-orange-100 shadow-lg;
 }
 
 .card-gradient {
-  background: var(--gradient-section);
+  background: var(--card-gradient);
 }
 
 @layer components {
-  /* Animate fade-in and slide-in from below, for sections/cards */
   .animate-fade-in {
-    animation: fadeInSection 0.6s cubic-bezier(0.41,0.49,0.31,0.99) forwards;
+    animation: fadeInSection 0.72s cubic-bezier(0.41,0.49,0.31,0.99) forwards;
   }
   .animate-slide-in {
-    animation: slideInFromBottom 0.7s cubic-bezier(0.41,0.49,0.31,0.99) forwards;
+    animation: slideInFromBottom 0.84s cubic-bezier(0.41,0.49,0.31,0.99) forwards;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
   }
 }
 
-/* --- Animations --- */
 @keyframes fadeInSection {
-  0% { opacity: 0; transform: translateY(16px);}
+  0% { opacity: 0; transform: translateY(18px);}
   100% { opacity: 1; transform: translateY(0);}
 }
 @keyframes slideInFromBottom {
-  0% { opacity: 0; transform: translateY(48px);}
+  0% { opacity: 0; transform: translateY(54px);}
   100% { opacity: 1; transform: translateY(0);}
+}
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale(0.96);}
+  100% { opacity: 1; transform: scale(1);}
 }
 .animate-fade-in { opacity: 0; animation: fadeInSection 0.7s forwards; }
 .animate-slide-in { opacity: 0; animation: slideInFromBottom 1.1s forwards; }
+.animate-scale-in { opacity: 0; animation: scaleIn 0.5s forwards; }
 
-/* Glass-card shadow and border */
-.glass-card,
-.card-gradient {
-  box-shadow: 0 8px 32px 0 rgba(100,150,255,0.12), 0 1.5px 8px 0 #99bdffa2;
-  border-radius: 1.2rem;
-  border: 1.5px solid #e9eefa;
+/* Glass-card shadow and border tweaks */
+.glass-card, .card-gradient {
+  border-radius: 1.3rem;
+  border: 1.5px solid #f8eacb;
 }
 
-/* Map UI - Leaflet Light Mode Tweaks */
-.leaflet-tile-pane {
-  filter: none !important;
-}
+/* Map UI - Light Mode */
+.leaflet-tile-pane { filter: none !important; }
 .leaflet-control-container .leaflet-control,
 .leaflet-popup-content-wrapper, 
 .leaflet-popup-tip {
-  background-color: #f9fafc !important;
-  color: #1c2639 !important;
-  border-color: #bcd3ee !important;
-  border-radius: 0.8rem !important;
+  background-color: #fff9ee !important;
+  color: #42382d !important;
+  border-color: #ffe2b0 !important;
+  border-radius: 0.9rem !important;
   font-size: 1rem !important;
 }
 .leaflet-popup-content-wrapper {
-  box-shadow: 0 12px 32px 0 rgba(180,200,255,0.14) !important;
-  padding: 0.9rem 1.2rem !important;
+  box-shadow: 0 12px 32px 0 rgba(251,210,120,0.11) !important;
+  padding: 0.95rem 1.3rem !important;
 }
 .leaflet-control-container .leaflet-control a {
-  color: #417bfa !important;
+  color: #ffb35c !important;
 }
 .leaflet-popup-content { color: #313a46 !important; }
 
-/* Custom scrollbar for light theme */
-::-webkit-scrollbar { width: 8px; height: 8px; background: #EAF1FD; }
-::-webkit-scrollbar-thumb { background: #bfd6f7; border-radius: 12px; }
-::-webkit-scrollbar-thumb:hover { background: #aaccfa; }
-
+/* Custom Scrollbar - Light & Creative */
+::-webkit-scrollbar { width: 9px; height: 9px; background: #ffe7b8; }
+::-webkit-scrollbar-thumb { background: #ffd59c; border-radius: 14px; }
+::-webkit-scrollbar-thumb:hover { background: #ffc06d; }

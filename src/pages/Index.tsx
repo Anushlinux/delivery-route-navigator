@@ -248,49 +248,50 @@ const Index = () => {
       : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-100 section-padding">
-      <div className="max-w-7xl mx-auto animate-fade-in">
-        <header className="mb-6 animate-slide-in">
+    <div className="min-h-screen bg-gradient-to-br from-[#fffbe9] via-[#fef7fa] to-[#dbfbff] section-padding transition-colors duration-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 animate-fade-in">
+        <header className="mb-7 animate-slide-in">
           <div className="flex items-center justify-between gap-x-3">
-            <h1 className="text-4xl font-extrabold text-foreground flex items-center drop-shadow-lg">
-              <PackageOpen className="mr-2 h-9 w-9 text-primary drop-shadow-xl" />
-              <span className="bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent select-none">DeliveryRoute Navigator</span>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-foreground flex items-center drop-shadow-lg">
+              <PackageOpen className="mr-2 h-10 w-10 text-primary drop-shadow-xl" />
+              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-[#70e1bf] bg-clip-text text-transparent select-none font-playfair tracking-tight">DeliveryRoute Navigator</span>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="ml-2"
                 onClick={() => setShowInfoDialog(true)}
               >
-                <Info className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
+                <Info className="h-6 w-6 text-amber-400 hover:text-primary transition-colors" />
               </Button>
             </h1>
             <div className="flex items-center">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center rounded-full bg-blue-100/65 px-3 py-1 text-sm text-foreground drop-shadow">
-                      <RouteIcon className="mr-1 h-4 w-4 text-primary" />
+                    <div className="flex items-center rounded-full bg-amber-100/65 px-3 py-1 text-base text-foreground drop-shadow animate-scale-in">
+                      <RouteIcon className="mr-1 h-5 w-5 text-primary" />
                       <span>Traveling Salesperson Problem Simulator</span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-secondary text-foreground border-border shadow-lg">
+                  <TooltipContent className="bg-accent text-foreground border-border shadow-lg">
                     <p className="w-80 text-sm">
-                      This app visualizes the legendary TSP—find the shortest path to deliver everywhere!
+                      Optimizing routes with minimal distance &amp; maximum style!
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
           </div>
-          <p className="text-muted-foreground mt-2 text-lg font-medium">
-            Optimize multi-stop delivery routes with beautiful step-by-step animations and interactive maps.
+          <p className="text-muted-foreground mt-3 text-xl font-medium max-w-2xl leading-relaxed animate-fade-in">
+            Plan beautiful multi-stop delivery routes around the world.<br className="hidden md:inline" />
+            <span className="text-primary font-bold">Fast, interactive, and fun to watch.</span>
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left column - Map */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* Left Map */}
           <div className="lg:col-span-2">
-            <Card className="h-[600px] overflow-hidden glass-card shadow-xl border-0">
+            <Card className="h-[600px] overflow-hidden glass-card shadow-2xl border-0">
               <LeafletMap
                 locations={locations}
                 route={routeToDisplay}
@@ -300,14 +301,14 @@ const Index = () => {
               />
             </Card>
           </div>
-          {/* Right column - Controls */}
-          <div className="space-y-6">
+          {/* Controls */}
+          <div className="space-y-8">
             <Tabs defaultValue="locations" className="animate-fade-in">
-              <TabsList className="grid w-full grid-cols-2 card-gradient text-foreground/80 font-semibold rounded-lg shadow">
-                <TabsTrigger value="locations" className="data-[state=active]:bg-blue-400/80 data-[state=active]:text-white">Locations</TabsTrigger>
-                <TabsTrigger value="algorithm" className="data-[state=active]:bg-blue-400/80 data-[state=active]:text-white">Algorithm</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 shadow card-gradient rounded-xl text-foreground/90 font-semibold border border-accent">
+                <TabsTrigger value="locations" className="data-[state=active]:bg-primary data-[state=active]:text-white transition-colors">Locations</TabsTrigger>
+                <TabsTrigger value="algorithm" className="data-[state=active]:bg-primary data-[state=active]:text-white transition-colors">Algorithm</TabsTrigger>
               </TabsList>
-              <TabsContent value="locations" className="mt-2">
+              <TabsContent value="locations" className="mt-3">
                 <LocationInput
                   locations={locations}
                   onAddLocation={handleAddLocation}
@@ -315,7 +316,7 @@ const Index = () => {
                   onClearLocations={handleClearLocations}
                 />
               </TabsContent>
-              <TabsContent value="algorithm" className="mt-2">
+              <TabsContent value="algorithm" className="mt-3">
                 <AlgorithmSelector
                   selectedAlgorithm={selectedAlgorithm}
                   onSelectAlgorithm={setSelectedAlgorithm}
@@ -346,11 +347,11 @@ const Index = () => {
             )}
           </div>
         </div>
-        {/* Results section - only show if we have a route */}
+        {/* Results */}
         {routeResult && (
-          <div className="mt-8 animate-fade-in">
+          <div className="mt-10 animate-scale-in">
             <h2 className="text-2xl font-semibold mb-4 flex items-center text-foreground/90">
-              <RouteIcon className="mr-2 h-5 w-5 text-primary" />
+              <RouteIcon className="mr-2 h-6 w-6 text-primary" />
               <span>Optimal Delivery Route</span>
             </h2>
             <RouteDetails route={routeResult.path} distance={routeResult.distance} />
@@ -358,38 +359,34 @@ const Index = () => {
         )}
       </div>
       
-      {/* Information Dialog */}
+      {/* Info Dialog */}
       <Dialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
-        <DialogContent className="max-w-3xl bg-background border-border">
+        <DialogContent className="max-w-3xl bg-background border-border card-gradient rounded-2xl shadow-2xl animate-fade-in">
           <DialogHeader>
-            <DialogTitle className="text-xl flex items-center text-foreground">
-              <Info className="mr-2 h-5 w-5 text-primary" />
-              About The Traveling Salesperson Problem
+            <DialogTitle className="text-2xl flex items-center text-foreground gap-2">
+              <Info className="h-6 w-6 text-primary" />
+              About This App
             </DialogTitle>
           </DialogHeader>
-          <DialogDescription className="space-y-4 text-muted-foreground">
+          <DialogDescription className="space-y-5 text-muted-foreground max-w-2xl">
             <p>
-              The <strong className="text-foreground">Traveling Salesperson Problem (TSP)</strong> is a classic algorithmic puzzle: Find the shortest path to visit multiple places exactly once and return to your original starting point!
+              <strong className="text-primary">Traveling Salesperson Problem (TSP)</strong> visualizer—find the shortest route to visit all your locations and see the solution in action!
             </p>
-            <h3 className="font-semibold text-foreground">How to use:</h3>
-            <ol className="list-decimal pl-5 space-y-2">
-              <li>Add delivery locations by clicking the map or searching addresses.</li>
-              <li>Select a solving algorithm and hit "Calculate Route!"</li>
-              <li>Watch the animated step-by-step solution unfold visually.</li>
-              <li>See route details, performance, and the optimal sequence below the map.</li>
+            <h3 className="font-semibold text-accent-foreground">Tips:</h3>
+            <ol className="list-decimal pl-6 space-y-1">
+              <li>Click the map or search an address to add stops.</li>
+              <li>Pick an algorithm, watch the animation.</li>
+              <li>See route details and metrics live!</li>
             </ol>
-            <h3 className="font-semibold text-foreground">Algorithms Explained:</h3>
-            <ul className="list-disc pl-5 space-y-2">
-              <li><strong className="text-foreground">Brute Force:</strong> Checks all possible routes for the absolute best (small problems only).</li>
-              <li><strong className="text-foreground">Nearest Neighbor:</strong> Greedily visits the nearest spot each time—fast, but not always perfect.</li>
-              <li><strong className="text-foreground">2-Opt:</strong> Tries to refine routes by swapping stops and seeing if it gets shorter—good balance of speed and optimality.</li>
+            <h3 className="font-semibold text-primary mt-4">How do the algorithms work?</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><span className="font-bold text-accent-foreground">Brute Force:</span> Checks every possible order (slow for lots of stops—fun for geeks!)</li>
+              <li><span className="font-bold text-accent-foreground">Nearest Neighbor:</span> Quick and sometimes greedy—fast but not perfect.</li>
+              <li><span className="font-bold text-accent-foreground">2-Opt:</span> Keeps swapping to get shorter—a great middle ground.</li>
             </ul>
-            <p className="text-xs text-muted-foreground/70">
-              For larger numbers of locations, exact solutions become impractical—these visualizations let you see why in real time!
-            </p>
           </DialogDescription>
           <DialogFooter>
-            <Button onClick={() => setShowInfoDialog(false)} className="bg-blue-500 text-white font-bold rounded-xl py-2 px-6 shadow hover:bg-blue-600 transition">Got it</Button>
+            <Button onClick={() => setShowInfoDialog(false)} className="bg-primary text-white font-bold rounded-xl py-2 px-7 shadow-xl hover:bg-amber-500/90 transition-all duration-200">Got it!</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
