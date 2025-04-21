@@ -37,19 +37,20 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
   // Initialize map on component mount with dark mode
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
-      // Use a dark-themed map style
-      const map = L.map(mapContainerRef.current).setView([40, -95], 4);
+      // Set initial view to Mumbai
+      const map = L.map(mapContainerRef.current).setView([19.076, 72.8777], 12);
       
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19,
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 20,
       }).addTo(map);
       
       mapRef.current = map;
       
       // Add map click handler
       map.on('click', (e: L.LeafletMouseEvent) => {
-        // Create a ripple effect on click
+        // Create a creative ripple effect in the new color
         const ripple = L.divIcon({
           html: `<div class="ripple"></div>`,
           className: 'ripple-container',
@@ -61,40 +62,30 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
           .on('add', () => {
             setTimeout(() => {
               map.removeLayer(rippleMark);
-            }, 1000);
+            }, 800);
           });
         
         onMapClick([e.latlng.lat, e.latlng.lng]);
       });
 
-      // Add custom CSS for the ripple effect
+      // Light style for ripple
       if (!document.getElementById('leaflet-ripple-style')) {
         const style = document.createElement('style');
         style.id = 'leaflet-ripple-style';
         style.innerHTML = `
-          .ripple-container {
-            background: transparent;
-          }
+          .ripple-container { background: transparent; }
           .ripple {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background: rgba(66, 153, 225, 0.4);
+            width: 24px;
+            height: 24px;
+            background: rgba(85,178,255,0.3);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            animation: ripple-animation 1s ease-out;
+            animation: ripple-animation 0.8s cubic-bezier(0.28,0.85,0.42,1.02);
           }
           @keyframes ripple-animation {
-            0% {
-              width: 0;
-              height: 0;
-              opacity: 1;
-            }
-            100% {
-              width: 100px;
-              height: 100px;
-              opacity: 0;
-            }
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 100px; height: 100px; opacity: 0; }
           }
         `;
         document.head.appendChild(style);
@@ -132,10 +123,11 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
         // Update existing marker position and popup
         marker.setLatLng(location.position);
         marker.bindPopup(`
-          <div class="text-white">
-            <b>${location.name}</b><br>Stop #${index + 1}
+          <div style="color:#29313b;font-weight:bold;font-size:1rem;">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:6px;background:${color};margin-right:5px;"></span>
+            ${location.name}<br/><span style="color:#6c757d;font-weight:400;">Stop #${index + 1}</span>
           </div>
-        `);
+        `, { className: "custom-popup" });
       } else {
         // Create new marker with animation
         const icon = createMarkerIcon(color);
@@ -144,10 +136,11 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
           opacity: 0 // Start invisible for animation
         })
         .bindPopup(`
-          <div class="text-white">
-            <b>${location.name}</b><br>Stop #${index + 1}
+          <div style="color:#29313b;font-weight:bold;font-size:1rem;">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:6px;background:${color};margin-right:5px;"></span>
+            ${location.name}<br/><span style="color:#6c757d;font-weight:400;">Stop #${index + 1}</span>
           </div>
-        `)
+        `, { className: "custom-popup" })
         .addTo(mapRef.current!);
         
         // Animate marker appearance
@@ -162,7 +155,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
           const pulsingIcon = L.divIcon({
             html: `<div class="pulse-ring"></div>`,
             className: 'pulse-icon',
-            iconSize: [30, 30]
+            iconSize: [36, 36]
           });
           
           const pulsingMarker = L.marker(location.position, { 
@@ -170,33 +163,24 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
             zIndexOffset: -1
           }).addTo(mapRef.current!);
           
-          // Add custom CSS for the pulse effect
+          // Light color palette for pulse
           if (!document.getElementById('pulse-marker-style')) {
             const style = document.createElement('style');
             style.id = 'pulse-marker-style';
             style.innerHTML = `
-              .pulse-icon {
-                background: transparent;
-              }
+              .pulse-icon { background: transparent; }
               .pulse-ring {
                 position: absolute;
-                width: 30px;
-                height: 30px;
+                width: 36px; height: 36px;
                 border-radius: 50%;
-                background: rgba(38, 194, 129, 0.2);
-                border: 2px solid rgba(38, 194, 129, 0.5);
+                background: rgba(100,150,255,0.15);
+                border: 2px solid rgba(50,100,200,0.20);
                 transform: translate(-50%, -50%);
-                animation: pulse-animation 2s infinite;
+                animation: pulse-animation 1.4s infinite cubic-bezier(0.4,0,0.6,1);
               }
               @keyframes pulse-animation {
-                0% {
-                  transform: translate(-50%, -50%) scale(0.5);
-                  opacity: 1;
-                }
-                100% {
-                  transform: translate(-50%, -50%) scale(1.5);
-                  opacity: 0;
-                }
+                0% { transform: translate(-50%,-50%) scale(0.7); opacity: 0.8;}
+                100% { transform: translate(-50%,-50%) scale(1.7); opacity: 0;}
               }
             `;
             document.head.appendChild(style);
@@ -209,7 +193,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
     const bounds = getBoundsForLocations(locations);
     if (bounds && mapRef.current) {
       mapRef.current.fitBounds(bounds, { 
-        padding: [50, 50],
+        padding: [30, 30],
         animate: true,
         duration: 0.5
       });
@@ -229,7 +213,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       const routePoints = routeToPolyline(route);
       
       // Create animated polyline
-      const polyline = L.polyline([], createRouteStyle('#4da6ff', 4))
+      const polyline = L.polyline([], createRouteStyle('#417bfa', 5))
         .addTo(mapRef.current);
       
       routeLayerRef.current = polyline;
@@ -241,7 +225,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
           const currentPath = routePoints.slice(0, i + 1);
           polyline.setLatLngs(currentPath);
           i++;
-          setTimeout(drawRoute, 50);
+          setTimeout(drawRoute, 45);
         }
       };
       
@@ -249,26 +233,22 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       
       // Add direction arrows
       setTimeout(() => {
-        if (mapRef.current && routeLayerRef.current) {
-          const arrowDecorator = L.polylineDecorator(polyline, {
+        if (mapRef.current && routeLayerRef.current && (L as any).polylineDecorator) {
+          const decorator = (L as any).polylineDecorator(polyline, {
             patterns: [
               {
                 offset: 25,
-                repeat: 100,
-                symbol: L.Symbol.arrowHead({
-                  pixelSize: 12,
+                repeat: 80,
+                symbol: (L as any).Symbol.arrowHead({
+                  pixelSize: 14,
                   polygon: false,
-                  pathOptions: {
-                    color: '#4da6ff',
-                    weight: 3,
-                    opacity: 0.8
-                  }
+                  pathOptions: { color: "#417bfa", weight: 3, opacity: 0.92 }
                 })
               }
             ]
           }).addTo(mapRef.current);
         }
-      }, routePoints.length * 50 + 100);
+      }, routePoints.length * 45 + 100);
     }
   }, [route]);
   
@@ -343,7 +323,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
   }, [evaluatingEdge]);
 
   return (
-    <div ref={mapContainerRef} className="h-full w-full rounded-lg shadow-lg transition-all duration-300" />
+    <div ref={mapContainerRef} className="h-full w-full rounded-2xl shadow-xl bg-white/40 glassy-map transition-all duration-300 border border-blue-100" />
   );
 };
 
